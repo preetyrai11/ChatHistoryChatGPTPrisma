@@ -15,7 +15,7 @@ export default async function handler(req,res){
           userId: user.sub,
         },
         select: {
-          id: false,
+          id: true,
           title: true,
           createdAt: false,
           // Include other fields you want to retrieve, except 'userId' and 'messages'
@@ -27,7 +27,10 @@ export default async function handler(req,res){
       
       console.log("GET CHAT LIST, GET CHAT LIST:--", chats);
 
-      res.status(200).json({ chats }); 
+      res.status(200).json({ 
+         chats , 
+         
+        }); 
       
     } catch(e){
         res

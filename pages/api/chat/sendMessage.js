@@ -1,6 +1,8 @@
-
 import { OpenAIEdgeStream } from "openai-edge-stream";
 import { faRobot } from "@fortawesome/free-solid-svg-icons"
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
 
 export const config = {
     runtime: "edge", 
@@ -15,7 +17,7 @@ export default async function handler(req){
         console.log("MESSAGE: ", message);
 
         const initialChatMessage = {
-            role: "system",
+            role: "assitant",
             content: "Your name is AI application, you are incredibly intelligent AI"
         }; 
 
@@ -53,8 +55,10 @@ export default async function handler(req){
           const json = await response.json();
           console.log("NEW CHAT: ", json);
 
-          chatId = json._id;
-          newChatId = json._id;
+          console.log("CHAT ID CHAT ID CHAT ID 99999:--- ", json.id);
+
+          chatId = json.id;
+          newChatId = json.id;
         } 
         
         const stream = await OpenAIEdgeStream(
@@ -104,4 +108,49 @@ export default async function handler(req){
         console.log("AN ERROR OCCURED IN SENDMESSAGE: ", e); 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

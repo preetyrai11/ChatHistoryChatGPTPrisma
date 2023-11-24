@@ -1,21 +1,31 @@
 import { getSession } from "@auth0/nextjs-auth0";
-import clientPromise from "lib/mongodb";
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
 
 export default async function handler(req,res){
     try{
+      
+
       const { user } = await getSession(req, res);
-      const client = await clientPromise; 
-      const db = client.db("BookMeds");
-      const chats = await db.collection("chats").find({
-        userId: user.sub 
-      }, {
-        projection: {
-           userId: 0,
-           messages: 0 
-        }
-      }).sort({
-          _id: -1 
-      }).toArray();
+      
+
+      const chats = await prisma.chats.findMany({
+        where: {
+          userId: user.sub,
+        },
+        select: {
+          id: false,
+          title: true,
+          createdAt: false,
+          // Include other fields you want to retrieve, except 'userId' and 'messages'
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
+      
+      console.log("GET CHAT LIST, GET CHAT LIST:--", chats);
 
       res.status(200).json({ chats }); 
       

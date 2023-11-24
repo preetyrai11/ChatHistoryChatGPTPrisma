@@ -7,8 +7,13 @@ import { v4 as uuid } from 'uuid';
 import { Message } from 'components/Message';
 import { useRouter } from "next/router";
 import { getSession } from "@auth0/nextjs-auth0";
-import clientPromise from "lib/mongodb";
-import { ObjectId } from "mongodb"; 
+// import clientPromise from "lib/mongodb";
+// import { ObjectId } from "mongodb"; 
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+
+
 
 const ChatPage = ({ chatId, title, messages = [] }) => {
 
@@ -34,7 +39,7 @@ const ChatPage = ({ chatId, title, messages = [] }) => {
   useEffect(() => {
     if(!generatingResponse && fullMessage){
       setNewChatMessages(prev => [...prev, {
-         _id: uuid(),
+         id: uuid(),
          role: "assistant",
          content: fullMessage
       }])
@@ -56,7 +61,7 @@ const ChatPage = ({ chatId, title, messages = [] }) => {
         const newChatMessages = [
             ...prev, 
             {
-              _id: uuid(), 
+              id: uuid(), 
               role: "user",
               content: messageText, 
             }, 
@@ -65,6 +70,7 @@ const ChatPage = ({ chatId, title, messages = [] }) => {
     }); 
 
     setMessageText("");
+
     // console.log("MESSAGE TEXT: ", messageText);
 
     
@@ -128,7 +134,7 @@ const ChatPage = ({ chatId, title, messages = [] }) => {
            <div className="flex-1 overflow-scroll text-white"> 
            {allMessages.map(message => (
              <Message 
-               key={message._id } 
+               key={message.id } 
                role={message.role} 
                content={message.content} 
              /> 
@@ -169,35 +175,37 @@ const ChatPage = ({ chatId, title, messages = [] }) => {
   ); 
 }
 
+ 
 
 export const getServerSideProps = async (ctx) => {
-    const chatId = ctx.params?.chatId?.[0] || null;
-    if(chatId){
-       const {user} = await getSession(ctx.req, ctx.res);
-       const client = await clientPromise; 
-       const db = client.db("BookMeds");
-       const chat = await db.collection("chats").findOne({
+  
+  const chatId = ctx.params?.chatId?.[0] || null;
+  console.log("CHAT ID CHAT ID CONTEXT:--", chatId); 
+
+  if(chatId){
+    const {user} = await getSession(ctx.req, ctx.res);
+    
+    const chat = await prisma.chats.findFirst({
+     where: {
          userId: user.sub,
-         _id: new ObjectId(chatId) 
-       }); 
-       return {
-        props: {
-          chatId,
-          title: chat.title,
-          messages: chat.messages.map(message => ({
-             ...message, 
-             _id: uuid(),
-          }))
-        }, 
-      }; 
-    }
+         id: chatId 
+     }
+ });
     return {
-      props: {} 
-    }
+     props: {
+       chatId,
+       title: chat.title,
+       messages: chat.messages.map(message => ({
+          ...message, 
+          id: uuid(),
+       }))
+     }, 
+   }; 
+ }
+ return {
+   props: {} 
+ }
 }; 
-
-
-
 
 export default ChatPage
 

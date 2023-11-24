@@ -4,8 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMessage, faRightFromBracket } from "@fortawesome/free-solid-svg-icons"; 
 
 
-
 export const ChatSidebar = ({ chatId }) => {
+
+
+  console.log("CHAT SIDE BAR CHAT SIDE BAR:--", chatId);
    const [chatList, setChatList] = useState([]); 
 
    useEffect(() => {
@@ -29,18 +31,18 @@ export const ChatSidebar = ({ chatId }) => {
           <div className="flex-1 overflow-auto bg-gray-950"> 
              {chatList.map((chat) => (
               <Link 
-                key={chat._id} 
-                href={`/chat/${chat._id}`}
-                className={`side-menu-item ${chatId === chat._id ? "bg-gray-700 hover:bg-gray-700" : "" 
+                key={chat.id} 
+                href={`/chat/${chat.id}`}
+                className={`side-menu-item ${chatId === chat.id ? "bg-gray-700 hover:bg-gray-700" : "" 
               }`}
               >  
                  <FontAwesomeIcon icon={faMessage} /> 
                  <span 
                    title={chat.title} 
                    className="overflow-hidden text-ellipses whitespace-nowrap"
-                   > 
+                > 
                     {chat.title}
-                   </span>
+                </span>
               </Link>
              ))}
           </div>
@@ -50,6 +52,11 @@ export const ChatSidebar = ({ chatId }) => {
         </div>
     )
 };
+
+
+
+
+
 
 
 
